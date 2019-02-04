@@ -1,0 +1,90 @@
+XORvalue:     It is a 4-byte value located 16 bytes before the start of the audio data block. It is different for each game.
+InputBuffer:  An array of 16 bytes.
+XORvar:       Temporary variable.
+InvertThing:  Temporary variable.
+InvertInt:    Temporary variable.
+iloc:         Location in the file.
+
+Copymemory:   Copies memory from one variable to another. COPYMEMORY [destination], [source], [bytes]
+
+
+&H80 can be written in C as 0x80
+&H80& can be written in C as 0x00000080
+
+
+
+                    '------------------------------------------------------
+                    'IIDX11-13
+                    '------------------------------------------------------
+                        If InputBuffer(iloc + 1) = 4 Then
+                            XORValue = XORValue And &HFFFF00FF
+                        End If
+                        CopyMemory XORvar, InputBuffer(iloc), 4
+                        XORvar = XORvar Xor XORValue
+                        CopyMemory InputBuffer(iloc), XORvar, 4
+                        InvertThing = InputBuffer(iloc + 2)
+                        If InvertThing <> 0 Then
+                            If InvertThing And &H10 Then
+                                InvertThing = &H120 - InvertThing
+                            Else
+                                InvertThing = &H100 - InvertThing
+                            End If
+                            If InvertThing < 0 Then InvertThing = InvertThing + &H100
+                            If InvertThing > 255 Then InvertThing = InvertThing - &H100
+                            InputBuffer(iloc + 2) = InvertThing
+                        End If
+                        InvertThing = InputBuffer(iloc + 3)
+                        If InvertThing <> 0 And InputBuffer(iloc + 1) <= 1 Then
+                            InvertInt = &H100
+                            If InvertThing And &H8 Then
+                                InvertInt = InvertInt + &H10
+                            End If
+                            If InvertThing And &H40 Then
+                                InvertInt = InvertInt - &H80
+                            End If
+                            InvertThing = InvertInt - InvertThing
+                            If InvertThing < 0 Then InvertThing = InvertThing + &H100
+                            If InvertThing > 255 Then InvertThing = InvertThing - &H100
+                        End If
+                        InputBuffer(iloc + 3) = InvertThing
+
+                    '------------------------------------------------------
+                    'GOLD BGM
+                    '------------------------------------------------------
+                        CopyMemory XORvar, InputBuffer(iloc), 4
+                        XORvar = XORvar Xor XORValue
+                        CopyMemory InputBuffer(iloc), XORvar, 4
+                        InvertThing = InputBuffer(iloc + 2)
+                        If InvertThing <> 0 Then
+                            If InvertThing And &H2 Then
+                                InvertThing = InvertThing Xor &HFC&
+                            ElseIf InvertThing And &H4 Then
+                                InvertThing = InvertThing Xor &HF8&
+                            ElseIf InvertThing And &H8 Then
+                                InvertThing = InvertThing Xor &HF0&
+                            ElseIf InvertThing And &H10 Then
+                                InvertThing = InvertThing Xor &HE0&
+                            ElseIf InvertThing And &H20 Then
+                                InvertThing = InvertThing Xor &HC0&
+                            ElseIf InvertThing And &H40 Then
+                                InvertThing = InvertThing Xor &H80&
+                            End If
+                            InputBuffer(iloc + 2) = InvertThing
+                        End If
+
+                    '------------------------------------------------------
+                    'GOLD Keysounds
+                    '------------------------------------------------------
+                        CopyMemory XORvar, InputBuffer(iloc), 4
+                        XORvar = XORvar Xor XORValue
+                        CopyMemory InputBuffer(iloc), XORvar, 4
+                        InvertThing = InputBuffer(iloc + 2)
+                        InvertInt = InvertThing + &H100&
+                        If InvertThing <> 0 Then
+                            If (InvertThing And &H4&) Then InvertInt = InvertInt - &H8&
+                            If (InvertThing And &H8&) Then InvertInt = InvertInt - &H10&
+                            If (InvertThing And &H10&) Then InvertInt = InvertInt - &H20&
+                            If (InvertThing And &H40&) Then InvertInt = InvertInt - &H80&
+                            InvertInt = (InvertInt And &HFF&)
+                            InputBuffer(iloc + 2) = InvertInt
+                        End If

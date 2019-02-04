@@ -1,0 +1,9 @@
+Form1 = 178, 29, 901, 641, , 22, 26, 742, 634, C
+modBass = 44, 44, 767, 656, C
+clsCSFile = 9, 6, 1085, 683, 
+clsHPTimer = 276, 61, 999, 673, 
+modPlayerMain = 124, 68, 847, 680, 
+clsFileStream = 154, 154, 988, 645, 
+clsSoundCapsule = 0, 0, 0, 0, C
+modRecordProc = 176, 176, 969, 679, 
+cls2DXDecode = 158, 107, 925, 703, 
